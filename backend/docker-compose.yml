@@ -1,0 +1,18 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:15
+    container_name: focusarena_db
+    restart: always
+    environment:
+      POSTGRES_DB: focusarena
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Ashika@123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
