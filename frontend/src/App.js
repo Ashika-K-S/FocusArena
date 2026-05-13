@@ -5,9 +5,15 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import ForgotPassword from "./pages/ForgotPassword";
 import SessionsPage from "./pages/SessionsPage";
+import JoinRoom from "./pages/JoinRoom";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import PublicRoute from "./components/PublicRoute";
+import Layout from "./components/Layout";
+
+import CreateRoom from "./pages/CreateRoom";
+import RoomLobby from "./pages/RoomLobby";
+import BattleRoom from "./pages/BattleRoom";
 
 function App() {
   return (
@@ -46,17 +52,61 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Layout>
+                <Dashboard />
+              </Layout>
             </ProtectedRoute>
           }
         />
 
-        {/* ✅ FIXED: moved inside Routes */}
         <Route
           path="/sessions"
           element={
             <ProtectedRoute>
-              <SessionsPage />
+              <Layout>
+                <SessionsPage />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/create-room"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <CreateRoom />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/join-room"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <JoinRoom />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/room/:roomCode"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <RoomLobby />
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+                <Route
+          path="/battle/:roomCode"
+          element={
+            <ProtectedRoute>
+              <BattleRoom />
             </ProtectedRoute>
           }
         />
