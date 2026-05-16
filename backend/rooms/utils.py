@@ -10,10 +10,10 @@ def execute_python_code(code, test_cases):
 
         local_scope = {}
 
-        # Execute user code
+        
         exec(code, {}, local_scope)
 
-        # Find first function safely
+        
         function = None
 
         for value in local_scope.values():
@@ -39,7 +39,7 @@ def execute_python_code(code, test_cases):
 
         overall_status = "CORRECT"
 
-        # Run all test cases
+       
         for test in test_cases:
 
             try:

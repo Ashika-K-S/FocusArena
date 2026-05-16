@@ -26,6 +26,7 @@ INSTALLED_APPS = [
     'rooms',
     'channels',
     'dashboard',
+    'problems',
 ]
 
 ASGI_APPLICATION = 'core.asgi.application'

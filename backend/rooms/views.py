@@ -191,14 +191,12 @@ class SubmitSolutionView(APIView):
             participant.score = total_score
             participant.save()
 
-            # Check if all problems are solved by this user
+
             total_possible_points = sum(cc.points for cc in room.contest_challenges.all())
             if total_score >= total_possible_points:
                 room.status = "FINISHED"
                 room.ended_at = timezone.now()
                 room.save()
-                
-                # Mark this user as the winner
                 participant.is_winner = True
                 participant.save()
 
