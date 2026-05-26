@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import api from "../api/axios";
 function AdminDashboard() {
   const [users, setUsers] = useState([]);
+  const [reason, setReason] = useState("");
   const [stats, setStats] = useState({
     total_users: 0,
     total_rooms: 0,
@@ -42,8 +43,14 @@ function AdminDashboard() {
     }
   };
   const handleBlockUser = async (userId) => {
+    if (!reason.trim()) {
+      alert("Please enter a reason for blocking");
+      return;
+    }
     try {
-      await api.patch(`/admin/users/${userId}/block/`);
+      await api.patch(`/admin/users/${userId}/block/`, {
+        reason: reason,
+      });
       setUsers((prev) =>
         prev.map((user) =>
           user.id === userId
@@ -247,6 +254,15 @@ function AdminDashboard() {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+        </div>
+        <div style={{ marginBottom: "1rem" }}>
+          <textarea
+             className="form-input"
+             style={{ width: "100%", padding: "0.75rem", minHeight: "80px", borderRadius: "8px", border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", color: "white" }}
+             placeholder="Enter reason for blocking (required before blocking a user)"
+             value={reason}
+             onChange={(e) => setReason(e.target.value)}
+          />
         </div>
         <div
           className="glass-card"

@@ -7,6 +7,12 @@ from accounts.models import User
 from accounts.permissions import IsAdmin
 from rooms.models import Room, Submission, Challenge, TestCase, RoomParticipant
 from rooms.serializers import ChallengeSerializer
+from django.utils import timezone
+from django.utils import timezone
+from django.core.mail import send_mail
+from utils.email_service import send_block_email
+from utils.email_service import send_unblock_email
+from django.utils import timezone
 class AdminUsersListView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     def get(self, request):
@@ -155,7 +161,7 @@ class DeleteRoomView(APIView):
             return Response({"error": "Room not found"}, status=404)
         room.delete()
         return Response({"message": "Room deleted successfully"})
-from django.utils import timezone
+
 
 class EndRoomView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
@@ -290,27 +296,73 @@ class AdminAllSubmissionsView(APIView):
                 }
             )
         return Response(data)
+
+
 class BlockUserView(APIView):
-    permission_classes = [IsAuthenticated]
+
+    permission_classes = [IsAuthenticated, IsAdmin]
+
     def patch(self, request, user_id):
+
         try:
             user = User.objects.get(id=user_id)
+
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=404)
+            return Response(
+                {"error": "User not found"},
+                status=404
+            )
+
         if user == request.user:
-            return Response({"error": "You cannot block yourself"}, status=400)
+            return Response(
+                {"error": "You cannot block yourself"},
+                status=400
+            )
+
         if user.role == "ADMIN":
-            return Response({"error": "Cannot block another admin"}, status=400)
+            return Response(
+                {"error": "Cannot block another admin"},
+                status=400
+            )
+
+        reason = request.data.get("reason")
+
         user.is_blocked = True
+        user.blocked_reason = reason
+        user.blocked_at = timezone.now()
+
         user.save()
-        return Response({"message": "User blocked successfully"})
+
+        send_block_email(user, reason)
+
+        return Response({
+            "message": "User blocked successfully"
+        })
+    
+
 class UnblockUserView(APIView):
-    permission_classes = [IsAuthenticated]
+
+    permission_classes = [IsAuthenticated, IsAdmin]
+
     def patch(self, request, user_id):
+
         try:
             user = User.objects.get(id=user_id)
+
         except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=404)
+            return Response(
+                {"error": "User not found"},
+                status=404
+            )
+
         user.is_blocked = False
+        user.blocked_reason = None
+        user.blocked_at = None
+
         user.save()
-        return Response({"message": "User unblocked successfully"})
+
+        send_unblock_email(user)
+
+        return Response({
+            "message": "User unblocked successfully"
+        })

@@ -16,6 +16,8 @@ from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from utils.email_service import send_block_email
+from django.utils import timezone
 UserModel = get_user_model()
 def get_client_ip(request):
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
@@ -55,9 +57,10 @@ class LoginView(TokenObtainPairView):
             user_id = refresh_obj["user_id"]
             user = UserModel.objects.get(id=user_id)
             if user.is_blocked:
-                return Response(
-                    {"error": "Your account has been blocked by admin"}, status=403
-                )
+                return Response({
+                    "error": "Your account has been blocked",
+                    "reason": user.blocked_reason
+                }, status=403)
         except Exception:
             return Response({"error": "Invalid token"}, status=401)
         UserSession.objects.create(
@@ -260,9 +263,10 @@ class GoogleLoginView(APIView):
             return Response({"error": f"Invalid Google token: {str(e)}"}, status=400)
         user = User.objects.filter(email=email).first()
         if user and user.is_blocked:
-            return Response(
-                {"error": "Your account has been blocked by admin"}, status=403
-            )
+            return Response({
+                "error": "Your account has been blocked",
+                "reason": user.blocked_reason
+            }, status=403)
         if not user:
             user = User.objects.create(email=email, username=email, role="USER")
         refresh = RefreshToken.for_user(user)

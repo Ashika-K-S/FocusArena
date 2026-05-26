@@ -13,6 +13,8 @@ class User(AbstractUser):
     password_changed_at = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_blocked = models.BooleanField(default=False)
+    blocked_reason = models.TextField(null=True, blank=True)
+    blocked_at = models.DateTimeField(null=True, blank=True)
     def save(self, *args, **kwargs):
         if self.pk:
             old_user = User.objects.get(pk=self.pk)
