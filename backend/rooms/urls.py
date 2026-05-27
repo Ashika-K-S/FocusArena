@@ -8,7 +8,9 @@ from .views import (
     RunCodeView,
     SubmissionListView,
     LeaderboardView,
-    TabSwitchWarningView,
+  
+    TrackFocusViolationView,
+    AdminViolationMonitorView
 )
 urlpatterns = [
     path("create/", CreateRoomView.as_view()),
@@ -19,5 +21,13 @@ urlpatterns = [
     path("<str:room_code>/run/", RunCodeView.as_view()),
     path("<str:room_code>/submissions/", SubmissionListView.as_view()),
     path("<str:room_code>/leaderboard/", LeaderboardView.as_view()),
-    path("rooms/tab-warning/", TabSwitchWarningView.as_view()),
+    
+    path(
+   "focus/track/",
+   TrackFocusViolationView.as_view()
+),
+path(
+   "admin/violations/",
+   AdminViolationMonitorView.as_view()
+),
 ]

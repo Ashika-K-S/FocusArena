@@ -5,6 +5,7 @@ from datetime import timedelta
 load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 DEBUG = os.getenv("DEBUG") == "True"
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.16.1.73"]
 INSTALLED_APPS = [
@@ -23,6 +24,7 @@ INSTALLED_APPS = [
     "channels",
     "dashboard",
     "administration",
+    "ai",
 ]
 ASGI_APPLICATION = "core.asgi.application"
 CHANNEL_LAYERS = {

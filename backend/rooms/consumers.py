@@ -1,26 +1,97 @@
 import json
+
 from channels.generic.websocket import AsyncWebsocketConsumer
+
+
 class LeaderboardConsumer(AsyncWebsocketConsumer):
+
     async def connect(self):
+
         self.room_code = self.scope["url_route"]["kwargs"]["room_code"]
+
         self.room_group_name = f"room_{self.room_code}"
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        await self.accept()
-    async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-    async def leaderboard_update(self, event):
-        await self.send(text_data=json.dumps({"type": "leaderboard_update"}))
-    async def submission_update(self, event):
-        await self.send(
-            text_data=json.dumps(
-                {"type": "submission_update", "submission": event.get("submission")}
-            )
+
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
         )
-class AdminSubmissionConsumer(AsyncWebsocketConsumer):
-    async def connect(self):
-        await self.channel_layer.group_add("admin_submissions", self.channel_name)
+
         await self.accept()
+
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard("admin_submissions", self.channel_name)
+
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    async def leaderboard_update(self, event):
+
+        await self.send(
+            text_data=json.dumps({
+                "type": "leaderboard_update"
+            })
+        )
+
     async def submission_update(self, event):
-        await self.send(text_data=json.dumps(event["data"]))
+
+        await self.send(
+            text_data=json.dumps({
+                "type": "submission_update",
+                "submission": event.get("submission")
+            })
+        )
+
+
+class AdminSubmissionConsumer(AsyncWebsocketConsumer):
+
+    async def connect(self):
+
+        await self.channel_layer.group_add(
+            "admin_submissions",
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+
+        await self.channel_layer.group_discard(
+            "admin_submissions",
+            self.channel_name
+        )
+
+    async def submission_update(self, event):
+
+        await self.send(
+            text_data=json.dumps(event["data"])
+        )
+
+
+class AdminViolationConsumer(AsyncWebsocketConsumer):
+
+    async def connect(self):
+
+        await self.channel_layer.group_add(
+            "admin_violations",
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+
+        await self.channel_layer.group_discard(
+            "admin_violations",
+            self.channel_name
+        )
+
+    async def violation_update(self, event):
+
+        await self.send(
+            text_data=json.dumps({
+                "type": "violation_update",
+                "data": event["data"]
+            })
+        )
+

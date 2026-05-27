@@ -122,3 +122,26 @@ class ContestChallenge(models.Model):
     points = models.IntegerField(default=100)
     def __str__(self):
         return f"{self.room.room_code} - {self.challenge.title}"
+    
+class FocusViolation(models.Model):
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    room = models.ForeignKey(
+        Room,
+        on_delete=models.CASCADE
+    )
+
+    violation_type = models.CharField(
+        max_length=50
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    def __str__(self):
+        return f"{self.user.username} - {self.violation_type}"

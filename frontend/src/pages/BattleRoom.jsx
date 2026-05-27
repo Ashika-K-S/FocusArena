@@ -4,6 +4,7 @@ import api from "../api/axios";
 import Editor from "@monaco-editor/react";
 import { Trophy, Clock3, AlertCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
+import useFocusTracking from "../hooks/useFocusTracking";
 function BattleRoom() {
   const { roomCode } = useParams();
   const navigate = useNavigate();
@@ -18,6 +19,11 @@ function BattleRoom() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [tabWarnings, setTabWarnings] = useState(0);
   const [showTabWarning, setShowTabWarning] = useState(false);
+  useFocusTracking(
+  roomCode,
+  setTabWarnings,
+  setShowTabWarning
+);
   const currentProblem = room?.problems?.[selectedProblem];
   const battleEnded = room?.status === "FINISHED";
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
@@ -79,28 +85,7 @@ function BattleRoom() {
     socket.onclose = () => console.log("WebSocket disconnected");
     return () => socket.close();
   }, [roomCode, fetchLeaderboard]);
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      if (document.hidden) {
-        setTabWarnings((prev) => prev + 1);
-        setShowTabWarning(true);
-        try {
-          await api.post("/rooms/tab-warning/", {
-            room_code: roomCode,
-          });
-        } catch (err) {
-          console.log(err);
-        }
-        setTimeout(() => {
-          setShowTabWarning(false);
-        }, 3000);
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
-  }, [roomCode]);
+
   useEffect(() => {
     if (!room?.started_at) return;
     const updateTimer = () => {

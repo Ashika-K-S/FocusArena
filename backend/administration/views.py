@@ -5,7 +5,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from accounts.models import User
 from accounts.permissions import IsAdmin
-from rooms.models import Room, Submission, Challenge, TestCase, RoomParticipant
+from rooms.models import (
+    Room,
+    Submission,
+    Challenge,
+    TestCase,
+    RoomParticipant,
+    FocusViolation,
+)
 from rooms.serializers import ChallengeSerializer
 from django.utils import timezone
 from django.utils import timezone
@@ -196,63 +203,129 @@ class KickParticipantView(APIView):
             return Response({"error": "Participant not found"}, status=404)
         participant.delete()
         return Response({"message": "Participant removed"})
+
 class AdminRoomDetailView(APIView):
+
     permission_classes = [IsAuthenticated, IsAdmin]
+
     def get(self, request, room_id):
+
         try:
+
             room = Room.objects.get(id=room_id)
+
         except Room.DoesNotExist:
-            return Response({"error": "Room not found"}, status=404)
+
+            return Response({
+                "error": "Room not found"
+            }, status=404)
+
         participants = []
+
         for participant in room.participants.all():
-            participants.append(
-                {
-                    "id": participant.id,
-                    "username": participant.user.username,
-                    "score": participant.score,
-                    "is_winner": participant.is_winner,
-                    "joined_at": participant.joined_at,
-                }
-            )
+
+            # =========================
+            # WARNING COUNT
+            # =========================
+
+            warning_count = FocusViolation.objects.filter(
+                user=participant.user,
+                room=room
+            ).count()
+
+            # =========================
+            # DISQUALIFICATION LOGIC
+            # =========================
+
+            is_disqualified = warning_count >= 5
+
+            participants.append({
+
+                "id": participant.id,
+
+                "username": participant.user.username,
+
+                "score": participant.score,
+
+                "tab_warnings": warning_count,
+
+                "is_disqualified": is_disqualified,
+
+                "is_winner": participant.is_winner,
+
+                "joined_at": participant.joined_at,
+            })
+
         submissions = []
-        for submission in room.submissions.all().order_by("-submitted_at"):
-            submissions.append(
-                {
-                    "username": submission.user.username,
-                    "challenge": submission.challenge.title,
-                    "status": submission.status,
-                    "language": submission.language,
-                    "submitted_at": submission.submitted_at,
-                }
-            )
+
+        for submission in room.submissions.all().order_by(
+            "-submitted_at"
+        ):
+
+            submissions.append({
+
+                "username": submission.user.username,
+
+                "challenge": submission.challenge.title,
+
+                "status": submission.status,
+
+                "language": submission.language,
+
+                "submitted_at": submission.submitted_at,
+            })
+
         contest_challenges = []
+
         for contest in room.contest_challenges.all():
-            contest_challenges.append(
-                {
-                    "title": contest.challenge.title,
-                    "difficulty": contest.challenge.difficulty,
-                    "points": contest.points,
-                    "order": contest.order,
-                }
-            )
+
+            contest_challenges.append({
+
+                "title": contest.challenge.title,
+
+                "difficulty": contest.challenge.difficulty,
+
+                "points": contest.points,
+
+                "order": contest.order,
+            })
+
         data = {
+
             "room": {
+
                 "id": room.id,
+
                 "room_code": room.room_code,
+
                 "status": room.status,
+
                 "difficulty": room.difficulty,
+
                 "time_limit_minutes": room.time_limit_minutes,
+
                 "max_participants": room.max_participants,
+
                 "created_by": room.created_by.username,
+
                 "started_at": room.started_at,
+
                 "ended_at": room.ended_at,
+
                 "created_at": room.created_at,
             },
+
             "participants": participants,
+
             "submissions": submissions,
+
             "contest_challenges": contest_challenges,
         }
+
         return Response(data)
+
+
+    
 class AdminRoomSubmissionsView(APIView):
     permission_classes = [IsAuthenticated, IsAdmin]
     def get(self, request, room_id):
