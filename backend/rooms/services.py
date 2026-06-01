@@ -5,8 +5,9 @@ from .models import (
     RoomParticipant,
     Submission,
     FocusViolation,
-
 )
+
+from ai.models import ContestFeedback
 
 from ai.services import (
     generate_contest_feedback,
@@ -16,7 +17,11 @@ from ai.services import (
 
 def finalize_room_contest(room):
 
-    if room.status == "FINISHED":
+    existing_feedback = ContestFeedback.objects.filter(
+        room=room
+    ).exists()
+
+    if room.status == "FINISHED" and existing_feedback:
         return
 
     room.status = "FINISHED"
@@ -94,8 +99,8 @@ from ai.services import (
 
 def finalize_room_contest(room):
 
-    if room.status == "FINISHED":
-        return
+    # if room.status == "FINISHED":
+    #     return
 
     room.status = "FINISHED"
 

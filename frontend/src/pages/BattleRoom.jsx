@@ -5,6 +5,7 @@ import Editor from "@monaco-editor/react";
 import { Trophy, Clock3, AlertCircle, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import useFocusTracking from "../hooks/useFocusTracking";
+
 function BattleRoom() {
   const { roomCode } = useParams();
   const navigate = useNavigate();
@@ -26,6 +27,11 @@ function BattleRoom() {
 );
   const currentProblem = room?.problems?.[selectedProblem];
   const battleEnded = room?.status === "FINISHED";
+  const currentUser = leaderboard.find(
+  (player) => player.username === localStorage.getItem("username")
+);
+
+const isDisqualified = currentUser?.is_disqualified;
   const [isMobile, setIsMobile] = useState(window.innerWidth < 900);
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 900);
@@ -34,18 +40,22 @@ function BattleRoom() {
   }, []);
   const hasInitializedCode = useRef(false);
   const fetchRoom = useCallback(async () => {
-    try {
-      const response = await api.get(`/rooms/${roomCode}/`);
-      setRoom(response.data);
-      if (!hasInitializedCode.current && response.data.problems?.length > 0) {
-        setCode(response.data.problems[0].starter_code || "");
-        hasInitializedCode.current = true;
-      }
-    } catch (err) {
-      console.error(err);
-      setError("Failed to load battle");
+  try {
+    const response = await api.get(`/rooms/${roomCode}/`);
+
+    console.log("ROOM DATA:", response.data);
+
+    setRoom(response.data);
+
+    if (!hasInitializedCode.current && response.data.problems?.length > 0) {
+      setCode(response.data.problems[0].starter_code || "");
+      hasInitializedCode.current = true;
     }
-  }, [roomCode]);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to load battle");
+  }
+}, [roomCode]);
   const fetchLeaderboard = useCallback(async () => {
     try {
       const response = await api.get(`/rooms/${roomCode}/leaderboard/`);
@@ -290,6 +300,25 @@ function BattleRoom() {
           <h2>Battle Finished</h2>
         </div>
       )}
+      {isDisqualified && (
+  <div
+    style={{
+      marginBottom: "2rem",
+      padding: "1rem",
+      borderRadius: "1rem",
+      background: "rgba(239,68,68,0.15)",
+      border: "1px solid rgba(239,68,68,0.4)",
+      color: "#fecaca",
+      textAlign: "center",
+    }}
+  >
+    <h2>⚠️ You Have Been Disqualified</h2>
+    <p>
+      You exceeded the allowed tab switching limit.
+      Submissions have been disabled.
+    </p>
+  </div>
+)}
       <div
         style={{
           display: "grid",
@@ -423,7 +452,7 @@ function BattleRoom() {
           <div style={{ display: "flex", gap: "1rem", marginBottom: "1.5rem" }}>
             <button
               onClick={handleRunCode}
-              disabled={battleEnded}
+              disabled={battleEnded || isDisqualified}
               style={{
                 flex: 1,
                 padding: "1rem",
@@ -439,7 +468,7 @@ function BattleRoom() {
             </button>
             <button
               onClick={handleSubmit}
-              disabled={battleEnded}
+              disabled={battleEnded || isDisqualified}
               style={{
                 flex: 1,
                 padding: "1rem",
@@ -644,6 +673,17 @@ function BattleRoom() {
                         <p style={{ fontSize: "0.75rem", color: "#94a3b8" }}>
                           {item.solved_count} Solved • {item.penalty}m Penalty
                         </p>
+                        {item.is_disqualified && (
+                        <span
+                          style={{
+                            color: "#ef4444",
+                            fontSize: "0.75rem",
+                            fontWeight: "700",
+                          }}
+                        >
+                          DISQUALIFIED
+                        </span>
+                      )}
                       </div>
                     </div>
                     <div style={{ textAlign: "right" }}>
@@ -826,13 +866,36 @@ function BattleRoom() {
                 ))}
               </div>
             </div>
-            <button
-              onClick={() => navigate("/dashboard")}
-              className="btn btn-primary"
-              style={{ width: "100%", padding: "1rem" }}
-            >
-              Return to Dashboard
-            </button>
+            <div
+  style={{
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  }}
+>
+  <button
+    onClick={() => navigate(`/feedback/${room.id}`)}
+    className="btn btn-primary"
+    style={{
+      width: "100%",
+      padding: "1rem",
+      background: "#7c3aed",
+    }}
+  >
+    View AI Performance Analysis
+  </button>
+
+  <button
+    onClick={() => navigate("/dashboard")}
+    className="btn btn-primary"
+    style={{
+      width: "100%",
+      padding: "1rem",
+    }}
+  >
+    Return to Dashboard
+  </button>
+</div>
           </motion.div>
         </div>
       )}

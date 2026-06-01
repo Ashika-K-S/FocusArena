@@ -19,6 +19,7 @@ import SubmissionsPage from "./pages/admin/SubmissionsPage";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminChallengeDetail from "./pages/admin/AdminChallengeDetail";
 import AdminRoomDetail from "./pages/admin/AdminRoomDetail";
+import ContestFeedback from "./pages/ContestFeedback";
 function App() {
   return (
     <BrowserRouter>
@@ -190,6 +191,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+            <Route
+      path="/feedback/:roomId"
+      element={
+        <ProtectedRoute>
+          <Layout>
+            <ContestFeedback />
+          </Layout>
+        </ProtectedRoute>
+      }
+/>
       </Routes>
     </BrowserRouter>
   );

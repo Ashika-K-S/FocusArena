@@ -152,12 +152,7 @@ class RoomDetailView(APIView):
 
                     if room.status != "FINISHED":
 
-                        room.status = "FINISHED"
-
-                        room.ended_at = timezone.now()
-
-                        room.save()
-
+                        finalize_room_contest(room)
             if room.status == "ACTIVE":
 
                 total_possible = sum(
@@ -172,20 +167,7 @@ class RoomDetailView(APIView):
 
                 if winner:
 
-                    room.status = "FINISHED"
-
-                    room.ended_at = timezone.now()
-
-                    room.save()
-
-                    if not RoomParticipant.objects.filter(
-                        room=room,
-                        is_winner=True
-                    ).exists():
-
-                        winner.is_winner = True
-
-                        winner.save()
+                    finalize_room_contest(room)
 
         except Room.DoesNotExist:
 
@@ -323,15 +305,11 @@ class SubmitSolutionView(APIView):
 
         if timezone.now() > end_time:
 
-            room.status = "FINISHED"
-
-            room.ended_at = timezone.now()
-
-            room.save()
+            finalize_room_contest(room)
 
             return Response({
-                "error": "Battle ended"
-            }, status=400)
+        "error": "Battle ended"
+    }, status=400)
 
         test_cases = challenge.test_cases.all()
 
@@ -385,16 +363,7 @@ class SubmitSolutionView(APIView):
 
             if total_score >= total_possible_points:
 
-                room.status = "FINISHED"
-
-                room.ended_at = timezone.now()
-
-                room.save()
-
-                participant.is_winner = True
-
-                participant.save()
-
+                finalize_room_contest(room)
         channel_layer = get_channel_layer()
 
         async_to_sync(channel_layer.group_send)(
