@@ -224,19 +224,10 @@ class AdminRoomDetailView(APIView):
 
         for participant in room.participants.all():
 
-            # =========================
-            # WARNING COUNT
-            # =========================
-
             warning_count = FocusViolation.objects.filter(
                 user=participant.user,
                 room=room
             ).count()
-
-            # =========================
-            # DISQUALIFICATION LOGIC
-            # =========================
-
             is_disqualified = warning_count >= 5
 
             participants.append({

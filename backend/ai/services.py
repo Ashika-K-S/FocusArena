@@ -9,9 +9,7 @@ client = Groq(
 
 def generate_contest_feedback(data):
 
-    # =========================
-    # SAFE CALCULATIONS
-    # =========================
+
 
     solved = data.get("solved", 0)
     wrong_submissions = data.get(
@@ -30,9 +28,7 @@ def generate_contest_feedback(data):
             2
         )
 
-    # =========================
-    # PROMPT
-    # =========================
+    
 
     prompt = f"""
     You are an expert competitive programming mentor.
