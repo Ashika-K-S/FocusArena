@@ -97,17 +97,42 @@ const isDisqualified = currentUser?.is_disqualified;
   }, [roomCode, fetchLeaderboard]);
 
   useEffect(() => {
-    if (!room?.started_at) return;
-    const updateTimer = () => {
-      const startedAt = new Date(room.started_at);
-      const endTime = startedAt.getTime() + room.time_limit * 60 * 1000;
-      const remaining = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
-      setTimeLeft(remaining);
-    };
-    updateTimer();
-    const interval = setInterval(updateTimer, 1000);
-    return () => clearInterval(interval);
-  }, [room]);
+  if (!room?.started_at) return;
+
+  const updateTimer = () => {
+
+   
+    if (room.status === "FINISHED") {
+      setTimeLeft(0);
+      return;
+    }
+
+    const startedAt = new Date(room.started_at);
+
+    const endTime =
+      startedAt.getTime() +
+      room.time_limit * 60 * 1000;
+
+    const remaining = Math.max(
+      0,
+      Math.floor(
+        (endTime - Date.now()) / 1000
+      )
+    );
+
+    setTimeLeft(remaining);
+  };
+
+  updateTimer();
+
+  const interval = setInterval(
+    updateTimer,
+    1000
+  );
+
+  return () => clearInterval(interval);
+
+}, [room]);
   const handleRunCode = async () => {
     try {
       setOutput("Running code...");
@@ -752,7 +777,7 @@ const isDisqualified = currentUser?.is_disqualified;
           </div>
         </div>
       </div>
-      {battleEnded && timeLeft === 0 && leaderboard.length > 0 && (
+      {battleEnded && leaderboard.length > 0 && (
         <div
           style={{
             position: "fixed",
