@@ -40,16 +40,25 @@ class CreateRoomView(APIView):
 
             return Response(serializer.errors, status=400)
 
+        available_challenges = list(
+            Challenge.objects.filter(
+                difficulty=serializer.validated_data["difficulty"]
+            ).order_by("?")[:3]
+        )
+
+        if len(available_challenges) < 3:
+
+            return Response(
+                {
+                    "error": f"Not enough {serializer.validated_data['difficulty']} challenges available. Please add challenges first."
+                },
+                status=400,
+            )
+
         room = Room.objects.create(
             created_by=request.user,
             difficulty=serializer.validated_data["difficulty"],
             time_limit_minutes=serializer.validated_data["time_limit"],
-        )
-
-        available_challenges = list(
-            Challenge.objects.filter(
-                difficulty=room.difficulty
-            ).order_by("?")[:3]
         )
 
         for index, challenge in enumerate(available_challenges):
@@ -73,7 +82,6 @@ class CreateRoomView(APIView):
             },
             status=201,
         )
-
 
 class JoinRoomView(APIView):
 
@@ -160,14 +168,15 @@ class RoomDetailView(APIView):
                     for cc in room.contest_challenges.all()
                 )
 
-                winner = RoomParticipant.objects.filter(
-                    room=room,
-                    score__gte=total_possible
-                ).first()
+                if total_possible > 0:
 
-                if winner:
+                    winner = RoomParticipant.objects.filter(
+                        room=room,
+                        score__gte=total_possible
+                    ).first()
 
-                    finalize_room_contest(room)
+                    if winner:
+                        finalize_room_contest(room)
 
         except Room.DoesNotExist:
 

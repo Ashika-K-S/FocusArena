@@ -65,13 +65,16 @@ const isDisqualified = currentUser?.is_disqualified;
     }
   }, [roomCode]);
   const fetchSubmissions = useCallback(async () => {
-    try {
-      const response = await api.get(`/rooms/${roomCode}/submissions/`);
-      setSubmissions(response.data);
-    } catch (err) {
-      console.error(err);
-    }
-  }, [roomCode]);
+  try {
+    const response = await api.get(`/rooms/${roomCode}/submissions/`);
+
+    console.log("SUBMISSIONS DATA:", response.data);
+
+    setSubmissions(response.data);
+  } catch (err) {
+    console.error(err);
+  }
+}, [roomCode]);
   useEffect(() => {
     fetchRoom();
     fetchLeaderboard();

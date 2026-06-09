@@ -265,7 +265,9 @@ function Dashboard() {
           className="glass-card"
           style={{ padding: "2rem", height: "400px" }}
         >
+          <div style={{ height: "300px" }}>
           <ResponsiveContainer width="100%" height="100%">
+
             <LineChart data={analytics}>
               <CartesianGrid
                 strokeDasharray="3 3"
@@ -307,6 +309,7 @@ function Dashboard() {
               />
             </LineChart>
           </ResponsiveContainer>
+          </div>
         </div>
       </motion.div>
       <motion.div variants={itemVariants} style={{ marginTop: "3rem" }}>

@@ -23,14 +23,17 @@ function RoomLobby() {
   const [countdown, setCountdown] = useState(null);
   const [error, setError] = useState("");
   const fetchRoom = async () => {
-    try {
-      const response = await api.get(`/rooms/${roomCode}/`);
-      setRoom(response.data);
-    } catch (err) {
-      console.error(err);
-      setError("Failed to locate this arena. It may have been decommissioned.");
-    }
-  };
+  try {
+    const response = await api.get(`/rooms/${roomCode}/`);
+
+    console.log("ROOM DATA:", response.data);
+
+    setRoom(response.data);
+  } catch (err) {
+    console.error(err);
+    setError("Failed to locate this arena. It may have been decommissioned.");
+  }
+};
   const fetchProfile = async () => {
     try {
       const response = await api.get("/auth/profile/");
@@ -42,27 +45,31 @@ function RoomLobby() {
   useEffect(() => {
     fetchProfile();
     fetchRoom();
-    const interval = setInterval(fetchRoom, 5000);
+    const interval = setInterval(fetchRoom, 1000);
     return () => clearInterval(interval);
   }, [roomCode]);
-  useEffect(() => {
-    if (room?.status !== "ACTIVE" || !room?.started_at) return;
-    const interval = setInterval(() => {
-      const started = new Date(room.started_at).getTime();
-      const now = new Date().getTime();
-      const diff = 10 - Math.floor((now - started) / 1000);
-      if (diff <= 0) {
-        setCountdown(0);
-        setTimeout(() => {
-          navigate(`/battle/${roomCode}`);
-        }, 1000);
-        clearInterval(interval);
-      } else {
-        setCountdown(diff);
+useEffect(() => {
+  if (!room?.started_at) return;
+
+  const interval = setInterval(() => {
+    const started = new Date(room.started_at).getTime();
+    const now = Date.now();
+
+    const diff = 10 - Math.floor((now - started) / 1000);
+
+    setCountdown(Math.max(diff, 0));
+
+    if (diff <= 0) {
+      clearInterval(interval);
+
+      if (room.status === "ACTIVE") {
+        navigate(`/battle/${roomCode}`);
       }
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [room]);
+    }
+  }, 1000);
+
+  return () => clearInterval(interval);
+}, [room?.started_at, room?.status, roomCode, navigate]);
   const copyCode = () => {
     navigator.clipboard.writeText(roomCode);
     setCopied(true);
@@ -346,7 +353,7 @@ function RoomLobby() {
                 Waiting for commander to initialize battle...
               </div>
             )}
-            {room.status === "ACTIVE" && (
+            {room.started_at && room.status !== "FINISHED" && (
               <div
                 style={{
                   marginTop: "1rem",

@@ -2,8 +2,13 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
-load_dotenv()
+
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+load_dotenv(BASE_DIR / ".env")
+
+print("SECRET_KEY LOADED:", bool(os.getenv("SECRET_KEY")))
+
 SECRET_KEY = os.getenv("SECRET_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 DEBUG = os.getenv("DEBUG") == "False"
@@ -31,7 +36,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("redis", 6379)]
         },
     },
 }
@@ -90,6 +95,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 AUTH_USER_MODEL = "accounts.User"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
