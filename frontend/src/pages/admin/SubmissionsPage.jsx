@@ -358,10 +358,9 @@ const SubmissionsPage = () => {
                         </div>
                       </td>
                       <td
-                        style={tdStyle}
-                        className="text-primary"
-                        style={{ ...tdStyle, fontWeight: "600" }}
-                      >
+                              className="text-primary"
+                              style={{ ...tdStyle, fontWeight: "600" }}
+                            >
                         {submission.challenge}
                       </td>
                       <td style={tdStyle}>
@@ -378,7 +377,6 @@ const SubmissionsPage = () => {
                         </span>
                       </td>
                       <td
-                        style={tdStyle}
                         style={{
                           ...tdStyle,
                           textTransform: "uppercase",
@@ -403,15 +401,14 @@ const SubmissionsPage = () => {
                           {submission.status}
                         </span>
                       </td>
-                      <td
-                        style={tdStyle}
-                        style={{
-                          ...tdStyle,
-                          color: "var(--text-muted)",
-                          fontSize: "0.875rem",
-                        }}
-                      >
-                        <div
+                          <td
+                    style={{
+                      ...tdStyle,
+                      color: "var(--text-muted)",
+                      fontSize: "0.875rem",
+                    }}
+                  >
+                                <div
                           style={{
                             display: "flex",
                             alignItems: "center",
