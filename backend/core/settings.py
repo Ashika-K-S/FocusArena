@@ -12,7 +12,12 @@ print("SECRET_KEY LOADED:", bool(os.getenv("SECRET_KEY")))
 SECRET_KEY = os.getenv("SECRET_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 DEBUG = os.getenv("DEBUG") == "False"
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.16.1.73"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "172.16.1.73",
+    "focusarena.duckdns.org",
+]
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -110,21 +115,29 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://172.16.1.73:3000",
+    "https://focus-arena-nine.vercel.app",
 ]
+
 CORS_ALLOW_CREDENTIALS = True
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://172.16.1.73:3000",
+    "https://focus-arena-nine.vercel.app",
 ]
+
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SECURE = True
+
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SECURE = False
+
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"

@@ -81,16 +81,16 @@ class LoginView(TokenObtainPairView):
             key="access",
             value=access,
             httponly=True,
-            secure=False,
-            samesite="Lax",
+            secure=True,
+            samesite="None",
             path="/",
         )
         response.set_cookie(
             key="refresh",
             value=refresh,
             httponly=True,
-            secure=False,
-            samesite="Lax",
+            secure=True,
+            samesite="None",
             path="/",
         )
         return response
@@ -116,16 +116,16 @@ class RefreshTokenView(APIView):
                 key="access",
                 value=access,
                 httponly=True,
-                secure=False,
-                samesite="Lax",
+                secure=True,
+                samesite="None",
                 path="/",
             )
             res.set_cookie(
                 key="refresh",
                 value=new_refresh,
                 httponly=True,
-                secure=False,
-                samesite="Lax",
+                secure=True,
+                samesite="None",
                 path="/",
             )
             return res
@@ -293,16 +293,16 @@ class GoogleLoginView(APIView):
             key="access",
             value=str(refresh.access_token),
             httponly=True,
-            secure=False,
-            samesite="Lax",
+            secure=True,
+            samesite="None",
             path="/",
         )
         res.set_cookie(
             key="refresh",
             value=str(refresh),
             httponly=True,
-            secure=False,
-            samesite="Lax",
+            secure=True,
+            samesite="None",
             path="/",
         )
         return res
