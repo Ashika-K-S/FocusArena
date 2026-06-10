@@ -124,6 +124,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://172.16.1.73:3000",
     "https://focus-arena-nine.vercel.app",
+    "https://focusarena.duckdns.org",
+
 ]
 
 SESSION_COOKIE_SAMESITE = "None"
