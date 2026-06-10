@@ -286,7 +286,7 @@ function Dashboard() {
           style={{ padding: "2rem", height: "400px" }}
         >
           <div style={{ height: "300px" }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={300}>
 
             <LineChart data={Array.isArray(analytics) ? analytics : []}>
               <CartesianGrid
