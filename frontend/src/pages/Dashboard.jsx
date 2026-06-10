@@ -43,13 +43,33 @@ function Dashboard() {
       api.get("dashboard/history/"),
       api.get("dashboard/analytics/"),
     ])
-      .then(([profileRes, statsRes, historyRes, analyticsRes]) => {
-        setProfile(profileRes.data);
-        setStats(statsRes.data);
-        setHistory(historyRes.data);
-        setAnalytics(analyticsRes.data);
-        setLoading(false);
-      })
+                .then(([profileRes, statsRes, historyRes, analyticsRes]) => {
+            console.log("PROFILE:", profileRes.data);
+            console.log("STATS:", statsRes.data);
+            console.log("HISTORY:", historyRes.data);
+            console.log("ANALYTICS:", analyticsRes.data);
+
+            setProfile(profileRes.data);
+            setStats(statsRes.data);
+
+            setHistory(
+              Array.isArray(historyRes.data)
+                ? historyRes.data
+                : historyRes.data?.results ||
+                    historyRes.data?.history ||
+                    []
+            );
+
+            setAnalytics(
+              Array.isArray(analyticsRes.data)
+                ? analyticsRes.data
+                : analyticsRes.data?.results ||
+                    analyticsRes.data?.analytics ||
+                    []
+            );
+
+            setLoading(false);
+          })
       .catch((err) => {
         console.error(err);
         setError("Failed to load dashboard");
@@ -268,7 +288,7 @@ function Dashboard() {
           <div style={{ height: "300px" }}>
           <ResponsiveContainer width="100%" height="100%">
 
-            <LineChart data={analytics}>
+            <LineChart data={Array.isArray(analytics) ? analytics : []}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke="rgba(255,255,255,0.05)"
@@ -395,7 +415,7 @@ function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {history.length > 0 ? (
+              {Array.isArray(history) && history.length > 0 ? (
                 history.map((item, i) => (
                   <tr
                     key={i}
