@@ -1,4 +1,4 @@
-name: Deploy Backend to EC2
+name: Deploy Backend
 
 on:
   push:
@@ -19,16 +19,15 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-
           script: |
             cd ~/FocusArena/backend
 
+            git fetch origin
+            git checkout development
             git pull origin development
 
-            docker compose down
+            sudo docker compose down
+            sudo docker compose build
+            sudo docker compose up -d
 
-            docker compose build
-
-            docker compose up -d
-
-            docker image prune -f
+            sudo docker image prune -f
